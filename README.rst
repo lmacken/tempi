@@ -21,8 +21,6 @@ First, sign up for an `EchoNest API key
 Using
 -----
 
-First, set the echonest API key values in this file.
-
 ::
 
     $ python tempi.py <directory of music>
