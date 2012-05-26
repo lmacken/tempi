@@ -55,27 +55,27 @@ class Tempi(object):
         data = []
         songs = {}
         ids = set()
-        for path, tags in self.walk_library(self.library):
+        for song in self.walk_library(self.library):
             try:
-                artist = tags['artist'][0]
-                title = tags['title'][0]
+                artist = song['artist'][0]
+                title = song['title'][0]
             except (KeyError, IndexError):
                 self.missing_tags += 1
                 continue
-            if tags.get('bpm'):
+            if song.get('bpm'):
                 self.bpm_exists += 1
                 continue
             if artist and title:
                 id = self.song_id('%s - %s' % (artist, title))
-                if path in songs or id in ids:
+                if song.filename in songs or id in ids:
                     self.song_dupe += 1
                     continue
-                songs[path] = True
+                songs[song.filename] = True
                 ids.add(id)
                 data.append({
                     'action': 'update',
                     'item': {
-                        'url': path,
+                        'url': song.filename,
                         'item_id': id,
                         'artist_name': artist,
                         'song_name': title,
@@ -107,11 +107,10 @@ class Tempi(object):
         print("Scanning music...")
         for root, dirs, files in os.walk(self.library):
             for filename in files:
-                url = os.path.join(root, filename)
-                song = mutagen.File(url, easy=True)
+                song = mutagen.File(os.path.join(root, filename), easy=True)
                 if not song:
                     continue
-                yield url, song
+                yield song
 
     def update_tempo_metadata(self, items):
         for item in items:
