@@ -21,16 +21,15 @@ import re
 import os
 import sys
 import time
-import eyeD3
+import mutagen
 import pyechonest.song
 import pyechonest.config
 import pyechonest.catalog
 
+## Add your API keys here
 pyechonest.config.ECHO_NEST_API_KEY = ''
 pyechonest.config.ECHO_NEST_CONSUMER_KEY = ''
 pyechonest.config.ECHO_NEST_SHARED_SECRET = ''
-
-EXTENSIONS = ('mp3', 'flac', 'ogg')
 
 
 class Tempi(object):
@@ -38,12 +37,11 @@ class Tempi(object):
     def __init__(self, directory):
         self.catalog = pyechonest.catalog.Catalog('tempi', type='song')
         self.library = directory
-        self.errors = 0
         self.bpm_exists = 0
         self.bpm_found = 0
         self.bpm_na = 0
         self.song_dupe = 0
-        self.unknown_files = 0
+        self.missing_tags = 0
 
     def run(self):
         items = self.update_catalog()
@@ -57,20 +55,27 @@ class Tempi(object):
         data = []
         songs = {}
         ids = set()
-        for song, tag in self.walk_library(self.library):
-            artist = tag.getArtist()
-            title = tag.getTitle()
+        for path, tags in self.walk_library(self.library):
+            try:
+                artist = tags['artist'][0]
+                title = tags['title'][0]
+            except (KeyError, IndexError):
+                self.missing_tags += 1
+                continue
+            if tags.get('bpm'):
+                self.bpm_exists += 1
+                continue
             if artist and title:
                 id = self.song_id('%s - %s' % (artist, title))
-                if song in songs or id in ids:
+                if path in songs or id in ids:
                     self.song_dupe += 1
                     continue
-                songs[song] = True
+                songs[path] = True
                 ids.add(id)
                 data.append({
                     'action': 'update',
                     'item': {
-                        'url': song,
+                        'url': path,
                         'item_id': id,
                         'artist_name': artist,
                         'song_name': title,
@@ -102,22 +107,11 @@ class Tempi(object):
         print("Scanning music...")
         for root, dirs, files in os.walk(self.library):
             for filename in files:
-                if filename.split('.')[-1].lower() in EXTENSIONS:
-                    url = os.path.join(root, filename)
-                    tag = eyeD3.Tag()
-                    try:
-                        tag.link(url)
-                        bpm = tag.getBPM()
-                    except Exception, e:
-                        print("Error: %s (%s)" % (str(e), url))
-                        self.errors += 1
-                        continue
-                    if bpm:
-                        self.bpm_exists += 1
-                        continue
-                    yield url, tag
-                else:
-                    self.unknown_files += 1
+                url = os.path.join(root, filename)
+                song = mutagen.File(url, easy=True)
+                if not song:
+                    continue
+                yield url, song
 
     def update_tempo_metadata(self, items):
         for item in items:
@@ -125,19 +119,19 @@ class Tempi(object):
             if tempo:
                 print("%s - %s (%s BPM)" % (item['artist_name'],
                       item['song_name'], tempo))
-                tag = tag = eyeD3.Tag()
-                tag.link(item['request']['url'])
-                tag.setBPM(tempo)
-                tag.update()
+                song = mutagen.File(item['request']['url'], easy=True)
+                song['bpm'] = unicode(tempo)
+                song.save()
                 self.bpm_found += 1
+            else:
+                self.bpm_na += 1
 
     def print_stats(self):
         print("Songs tagged with newly discovered BPM: %d" % self.bpm_found)
         print("Songs that already had BPM: %d" % self.bpm_exists)
         print("Songs with unknown BPM: %d" % self.bpm_na)
+        print("Songs with missing tags: %d" % self.missing_tags)
         print("Duplicate songs: %d" % self.song_dupe)
-        print("Unknown files: %d" % self.unknown_files)
-        print("Errors: %d" % self.errors)
 
     def close(self):
         self.catalog.delete()

@@ -13,10 +13,9 @@ First, sign up for an `EchoNest API key
 
 ::
 
-    $ sudo yum -y install python-virtualenv python-eyed3
-    $ virtualenv --system-site-packages env
+    $ virtualenv env
     $ source env/bin/activate
-    $ pip install pyechonest
+    $ pip install pyechonest mutagen
 
 Using
 -----
