@@ -46,36 +46,23 @@ class Tempi(object):
         self.unknown_files = 0
 
     def run(self):
-        items = self.update_catalog(self.library)
+        items = self.update_catalog()
         self.update_tempo_metadata(items)
 
     def song_id(self, song):
         """Return a valid Echo Nest item_id for a given song"""
         return re.sub(r'[^A-Za-z0-9\._\-]', '', song)
 
-    def update_catalog(self, library):
+    def generate_catalog_data(self):
         data = []
         songs = {}
         ids = set()
-        for song in self.walk_library(library):
-            tag = eyeD3.Tag()
-            try:
-                tag.link(song)
-                bpm = tag.getBPM()
-            except Exception, e:
-                print("Error: %s (%s)" % (str(e), song))
-                self.errors += 1
-                continue
-            if bpm:
-                self.bpm_exists += 1
-                continue
-
+        for song, tag in self.walk_library(self.library):
             artist = tag.getArtist()
             title = tag.getTitle()
             if artist and title:
                 id = self.song_id('%s - %s' % (artist, title))
                 if song in songs or id in ids:
-                    print("Skipping dupe song: %s" % song)
                     self.song_dupe += 1
                     continue
                 songs[song] = True
@@ -88,9 +75,12 @@ class Tempi(object):
                         'artist_name': artist,
                         'song_name': title,
                         }})
+        return data
 
+    def update_catalog(self):
+        data = self.generate_catalog_data()
         num_songs = len(data)
-        print("Adding %d songs to catalog" % num_songs)
+        print("Adding %d songs to the catalog" % num_songs)
         ticket = self.catalog.update(data)
         self.wait_for_catalog_update(ticket)
         items = self.catalog.get_item_dicts(buckets=['audio_summary'],
@@ -101,20 +91,31 @@ class Tempi(object):
     def wait_for_catalog_update(self, ticket):
         waiting = True
         while waiting:
+            time.sleep(2)
             status = self.catalog.status(ticket)
-            print("Updating Catalog (%s%%)" % status['percent_complete'])
+            print("Updating catalog (%0.2f%%)" % status['percent_complete'])
             assert status['ticket_status'] != 'error', status
             if status['ticket_status'] == 'complete':
                 waiting = False
-            else:
-                time.sleep(2)
 
     def walk_library(self, library):
         print("Scanning music...")
         for root, dirs, files in os.walk(self.library):
             for filename in files:
                 if filename.split('.')[-1].lower() in EXTENSIONS:
-                    yield os.path.join(root, filename)
+                    url = os.path.join(root, filename)
+                    tag = eyeD3.Tag()
+                    try:
+                        tag.link(url)
+                        bpm = tag.getBPM()
+                    except Exception, e:
+                        print("Error: %s (%s)" % (str(e), url))
+                        self.errors += 1
+                        continue
+                    if bpm:
+                        self.bpm_exists += 1
+                        continue
+                    yield url, tag
                 else:
                     self.unknown_files += 1
 
