@@ -21,7 +21,7 @@ Using
 
 First, set the echonest API key values in this file.
 
-    $ python tempofinder.py <directory of music>
+    $ python tempi.py <directory of music>
 """
 
 import re
