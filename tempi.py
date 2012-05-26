@@ -36,7 +36,7 @@ EXTENSIONS = ('mp3', 'flac', 'ogg')
 class Tempi(object):
 
     def __init__(self, directory):
-        self.catalog = pyechonest.catalog.Catalog('tempofinder', type='song')
+        self.catalog = pyechonest.catalog.Catalog('tempi', type='song')
         self.library = directory
         self.errors = 0
         self.bpm_exists = 0
@@ -147,9 +147,9 @@ if __name__ == '__main__':
         print("Usage: python %s <directory of music>" % sys.argv[0])
         sys.exit(-1)
 
-    tempofinder = Tempi(sys.argv[1])
+    tempi = Tempi(sys.argv[1])
     try:
-        tempofinder.run()
+        tempi.run()
     finally:
-        tempofinder.print_stats()
-        tempofinder.close()
+        tempi.print_stats()
+        tempi.close()
