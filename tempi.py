@@ -1,27 +1,20 @@
 #!/usr/bin/env python
+# tempi is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# tempi is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with tempi.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Copyright (C) 2012, Luke Macken <lmacken@redhat.com>
 """
-tempi.py - Add tempo metadata to your music using The Echo Nest
-===============================================================
-
-.. author:: Luke Macken <lmacken@redhat.com>
-.. license:: GPLv3+
-
-Installing
-----------
-
-Sign up for an EchoNest API key: https://developer.echonest.com/docs
-
-    $ sudo yum -y install python-virtualenv python-eyed3
-    $ virtualenv env
-    $ source env
-    $ pip install pyechonest
-
-Using
------
-
-First, set the echonest API key values in this file.
-
-    $ python tempi.py <directory of music>
+tempi.py - Add tempo metadata to your music collection using The Echo Nest.
 """
 
 import re
