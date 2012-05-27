@@ -142,6 +142,13 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print("Usage: python %s <directory of music>" % sys.argv[0])
         sys.exit(-1)
+    try:
+        import fabulous.text
+        print(str(fabulous.text.Text('tempi', shadow=True,
+            font='IndUni-H-Bold', color='#73d216')).rstrip() +
+            ' v%s' % __version__)
+    except ImportError:
+        print('tempi v%s' % __version__)
 
     tempi = Tempi(sys.argv[1])
     try:
