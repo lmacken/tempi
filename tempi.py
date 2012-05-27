@@ -28,6 +28,8 @@ import pyechonest.song
 import pyechonest.config
 import pyechonest.catalog
 
+from progressbar import ProgressBar, Percentage, Bar, Counter
+
 ## Add your API keys here
 pyechonest.config.ECHO_NEST_API_KEY = ''
 pyechonest.config.ECHO_NEST_CONSUMER_KEY = ''
@@ -57,10 +59,13 @@ class Tempi(object):
         return re.sub(r'[^A-Za-z0-9\._\-]', '', song)
 
     def generate_catalog_data(self):
+        """Generate a list of songs to update our Echo Nest Catalog with"""
         data = []
         songs = set()
         ids = set()
-        for song in self.walk_library(self.library):
+        progress = ProgressBar(widgets=['Scanning Library: ',
+            LibraryProgress(), ' songs'])
+        for song in progress(self.walk_library(self.library)):
             try:
                 artist = song['artist'][0]
                 title = song['title'][0]
@@ -114,16 +119,19 @@ class Tempi(object):
 
     def wait_for_catalog_update(self, ticket):
         waiting = True
+        print('Updating Catalog...')
+        progress = ProgressBar(maxval=100, widgets=[
+            Bar(marker=u"\u2593", left='[', right=']'), Percentage()]).start()
         while waiting:
             time.sleep(2)
             status = self.catalog.status(ticket)
-            print("Updating catalog (%0.2f%%)" % status['percent_complete'])
+            progress.update(status['percent_complete'])
             assert status['ticket_status'] != 'error', status
             if status['ticket_status'] == 'complete':
                 waiting = False
+        print
 
     def walk_library(self, library):
-        print("Scanning music...")
         for root, dirs, files in os.walk(self.library):
             for filename in files:
                 song = mutagen.File(os.path.join(root, filename), easy=True)
@@ -132,12 +140,19 @@ class Tempi(object):
                 yield song
 
     def update_tempo_metadata(self, items):
-        for item in items:
+        progress = ProgressBar(maxval=len(items), widgets=[
+            Bar(marker=u"\u2593", left='[', right=']'),
+            Percentage()])
+        up, save, restore, chop = ['\x1b[' + x for x in 'FsuK']
+        print('\n')
+        for item in progress(items):
             tempo = item.get('audio_summary', {}).get('tempo', None)
             if tempo:
-                print("%s - %s (%s BPM)" % (item['artist_name'],
-                      item['song_name'], tempo))
                 song = mutagen.File(item['request']['url'], easy=True)
+                sys.stdout.write("%s%sUpdating Metadata: %s - %s (%s BPM)%s%s" %
+                        (save, up, song['artist'][0], song['title'][0], tempo,
+                         chop, restore))
+                sys.stdout.flush()
                 song['bpm'] = unicode(tempo)
                 song.save()
                 self.bpm_found += 1
@@ -152,7 +167,14 @@ class Tempi(object):
         print("Duplicate songs: %d" % self.song_dupe)
 
     def close(self):
-        self.catalog.delete()
+        if self.catalog:
+            self.catalog.delete()
+
+
+class LibraryProgress(Counter):
+    """A custom progress bar used when scanning the library"""
+    def update(self, pbar):
+        return str(int(pbar.currval) + 1)
 
 
 if __name__ == '__main__':
