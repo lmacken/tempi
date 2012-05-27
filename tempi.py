@@ -137,12 +137,12 @@ class Tempi(object):
             for filename in files:
                 try:
                     song = mutagen.File(os.path.join(root, filename), easy=True)
-                    if not song:
-                        continue
-                    yield song
                 except Exception, e:
                     print(str(e))
                     self.errors += 1
+                if not song:
+                    continue
+                yield song
 
     def update_tempo_metadata(self, items):
         progress = ProgressBar(maxval=len(items), widgets=[
