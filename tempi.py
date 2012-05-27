@@ -158,9 +158,10 @@ class Tempi(object):
             tempo = item.get('audio_summary', {}).get('tempo', None)
             if tempo:
                 song = mutagen.File(item['request']['url'], easy=True)
-                sys.stdout.write("%s%sUpdating Metadata: %s - %s (%s BPM)%s%s" %
-                        (save, up, song['artist'][0], song['title'][0], tempo,
-                         chop, restore))
+                name = '%s - %s' % (song['artist'][0], song['title'][0])
+                if len(name) > 48: name = name[:45] + '...'
+                sys.stdout.write("%s%sUpdating Metadata: %s (%0.2f BPM)%s%s" %
+                        (save, up, name, tempo, chop, restore))
                 sys.stdout.flush()
                 song['bpm'] = unicode(tempo)
                 song.save()
