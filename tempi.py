@@ -58,7 +58,7 @@ class Tempi(object):
 
     def generate_catalog_data(self):
         data = []
-        songs = {}
+        songs = set()
         ids = set()
         for song in self.walk_library(self.library):
             try:
@@ -75,7 +75,7 @@ class Tempi(object):
                 if song.filename in songs or id in ids:
                     self.song_dupe += 1
                     continue
-                songs[song.filename] = True
+                songs.add(song.filename)
                 ids.add(id)
                 data.append({
                     'action': 'update',
