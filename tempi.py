@@ -124,7 +124,7 @@ class Tempi(object):
         progress = ProgressBar(maxval=100, widgets=[
             Bar(marker=u"\u2593", left='[', right=']'), Percentage()]).start()
         while waiting:
-            time.sleep(2)
+            time.sleep(1)
             status = self.catalog.status(ticket)
             progress.update(status['percent_complete'])
             assert status['ticket_status'] != 'error', status
