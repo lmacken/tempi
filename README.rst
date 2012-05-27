@@ -6,17 +6,18 @@ Add tempo metadata to your music collection.
 .. image:: http://the.echonest.com/media/images/logos/EN_P_on_White.gif
    :target: http://the.echonest.com
 
-Installing
-----------
+Requirements
+------------
 
-First, sign up for an `EchoNest API key
-<https://developer.echonest.com>`_, then add it to the top of tempi.py
+Sign up for an `EchoNest API key <https://developer.echonest.com>`_, add
+the information to the top of ``tempi.py``.
+
+Then install the Python dependencies:
 
 ::
 
-    $ virtualenv env
-    $ source env/bin/activate
-    $ pip install pyechonest mutagen progressbar
+    easy_install pyechonest mutagen progressbar fabulous
+
 
 Using
 -----
