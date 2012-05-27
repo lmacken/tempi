@@ -23,6 +23,7 @@ import re
 import os
 import sys
 import time
+import math
 import mutagen
 import pyechonest.song
 import pyechonest.config
@@ -98,39 +99,43 @@ class Tempi(object):
         data = self.generate_catalog_data()
         items = []
         num_songs = len(data)
+        num_chunks = math.ceil(num_songs / float(MAX_SONGS))
+        chunk_i = 1
         i = 0
         print("Found %d songs without tempo metadata\n" % num_songs)
         if not num_songs:
             return items
+        print('Updating Catalog...')
+        progress = ProgressBar(maxval=100 * num_chunks, widgets=[
+            Bar(marker=u"\u2593"), Percentage()]).start()
         self.catalog = pyechonest.catalog.Catalog('tempi', type='song')
         while True:
             chunk = data[:MAX_SONGS]
             chunk_len = len(chunk)
-            assert chunk_len < MAX_SONGS, chunk_len
+            assert chunk_len <= MAX_SONGS, chunk_len
             ticket = self.catalog.update(chunk)
-            self.wait_for_catalog_update(ticket)
+            for status in self.wait_for_catalog_update(ticket):
+                progress.update(int(status['percent_complete']) * chunk_i)
             items += self.catalog.get_item_dicts(buckets=['audio_summary'],
                                                  start=i, results=chunk_len)
             i += chunk_len
+            chunk_i += 1
             data = data[MAX_SONGS:]
             if not data:
                 break
         assert len(items) == num_songs, len(items)
+        progress.finish()
         return items
 
     def wait_for_catalog_update(self, ticket):
         waiting = True
-        print('Updating Catalog...')
-        progress = ProgressBar(maxval=100, widgets=[
-            Bar(marker=u"\u2593"), Percentage()]).start()
         while waiting:
             time.sleep(1)
             status = self.catalog.status(ticket)
-            progress.update(status['percent_complete'])
             assert status['ticket_status'] != 'error', status
+            yield status
             if status['ticket_status'] == 'complete':
                 waiting = False
-        print
 
     def walk_library(self, library):
         for root, dirs, files in os.walk(self.library):
