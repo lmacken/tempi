@@ -49,7 +49,8 @@ class Tempi(object):
 
     def run(self):
         items = self.update_catalog()
-        self.update_tempo_metadata(items)
+        if items:
+            self.update_tempo_metadata(items)
 
     def song_id(self, song):
         """Return a valid Echo Nest item_id for a given song"""
