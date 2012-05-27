@@ -28,7 +28,7 @@ Using
 Screenshot
 ----------
 
-.. image:: http://lewk.org/tempi.png
+.. image:: http://lewk.org/tempi-screenshot.png
 
 License
 -------
