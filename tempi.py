@@ -165,11 +165,19 @@ class Tempi(object):
                 self.bpm_na += 1
 
     def print_stats(self):
-        print("Songs tagged with newly discovered BPM: %d" % self.bpm_found)
-        print("Songs that already had BPM: %d" % self.bpm_exists)
-        print("Songs with unknown BPM: %d" % self.bpm_na)
-        print("Songs with missing tags: %d" % self.missing_tags)
-        print("Duplicate songs: %d" % self.song_dupe)
+        print('')
+        if self.bpm_found:
+            print("Songs tagged with newly discovered BPM: %d" % self.bpm_found)
+        if self.bpm_exists:
+            print("Songs that already had BPM: %d" % self.bpm_exists)
+        if self.bpm_na:
+            print("Songs with unknown BPM: %d" % self.bpm_na)
+        if self.missing_tags:
+            print("Songs with missing tags: %d" % self.missing_tags)
+        if self.song_dupe:
+            print("Duplicate songs: %d" % self.song_dupe)
+        if self.errors:
+            print("Errors accessing songs: %d" % self.errors)
 
     def close(self):
         if self.catalog:
