@@ -33,12 +33,14 @@ pyechonest.config.ECHO_NEST_API_KEY = ''
 pyechonest.config.ECHO_NEST_CONSUMER_KEY = ''
 pyechonest.config.ECHO_NEST_SHARED_SECRET = ''
 
+MAX_SONGS = 1000  # per catalog update
+
 
 class Tempi(object):
 
     def __init__(self, directory):
-        self.catalog = pyechonest.catalog.Catalog('tempi', type='song')
         self.library = directory
+        self.catalog = None
         self.bpm_exists = 0
         self.bpm_found = 0
         self.bpm_na = 0
@@ -85,14 +87,28 @@ class Tempi(object):
         return data
 
     def update_catalog(self):
+        """Create a new catalog and populate it with music from our library"""
         data = self.generate_catalog_data()
+        items = []
         num_songs = len(data)
-        print("Adding %d songs to the catalog" % num_songs)
-        ticket = self.catalog.update(data)
-        self.wait_for_catalog_update(ticket)
-        items = self.catalog.get_item_dicts(buckets=['audio_summary'],
-                                            results=num_songs)
-        print("Got %d items back from catalog" % len(items))
+        i = 0
+        print("Found %d songs without tempo metadata\n" % num_songs)
+        if not num_songs:
+            return items
+        self.catalog = pyechonest.catalog.Catalog('tempi', type='song')
+        while True:
+            chunk = data[:MAX_SONGS]
+            chunk_len = len(chunk)
+            assert chunk_len < MAX_SONGS, chunk_len
+            ticket = self.catalog.update(chunk)
+            self.wait_for_catalog_update(ticket)
+            items += self.catalog.get_item_dicts(buckets=['audio_summary'],
+                                                 start=i, results=chunk_len)
+            i += chunk_len
+            data = data[MAX_SONGS:]
+            if not data:
+                break
+        assert len(items) == num_songs, len(items)
         return items
 
     def wait_for_catalog_update(self, ticket):
