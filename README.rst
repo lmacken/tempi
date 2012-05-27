@@ -16,7 +16,7 @@ First, sign up for an `EchoNest API key
 
     $ virtualenv env
     $ source env/bin/activate
-    $ pip install pyechonest mutagen
+    $ pip install pyechonest mutagen progressbar
 
 Using
 -----
