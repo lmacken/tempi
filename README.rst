@@ -1,8 +1,10 @@
 tempi
 =====
 
-Add tempo metadata to your music collection using `The Echo Nest
-<http://echonest.com>`_.
+Add tempo metadata to your music collection.
+
+.. image:: http://the.echonest.com/media/images/logos/EN_P_on_White.gif
+   :target: http://the.echonest.com
 
 
 Installing
