@@ -48,6 +48,7 @@ class Tempi(object):
         self.bpm_na = 0
         self.song_dupe = 0
         self.missing_tags = 0
+        self.errors = 0
 
     def run(self):
         items = self.update_catalog()
@@ -134,10 +135,14 @@ class Tempi(object):
     def walk_library(self, library):
         for root, dirs, files in os.walk(self.library):
             for filename in files:
-                song = mutagen.File(os.path.join(root, filename), easy=True)
-                if not song:
-                    continue
-                yield song
+                try:
+                    song = mutagen.File(os.path.join(root, filename), easy=True)
+                    if not song:
+                        continue
+                    yield song
+                except Exception, e:
+                    print(str(e))
+                    self.errors += 1
 
     def update_tempo_metadata(self, items):
         progress = ProgressBar(maxval=len(items), widgets=[
