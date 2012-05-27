@@ -6,11 +6,6 @@ Add tempo metadata to your music collection.
 .. image:: http://the.echonest.com/media/images/logos/EN_P_on_White.gif
    :target: http://the.echonest.com
 
-Screenshot
-----------
-
-.. image:: http://lewk.org/tempi.png
-
 Installing
 ----------
 
@@ -29,6 +24,11 @@ Using
 ::
 
     $ python tempi.py <directory of music>
+
+Screenshot
+----------
+
+.. image:: http://lewk.org/tempi.png
 
 License
 -------
