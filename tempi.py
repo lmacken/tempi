@@ -17,6 +17,8 @@
 tempi.py - Add tempo metadata to your music collection using The Echo Nest.
 """
 
+__version__ = '0.2'
+
 import re
 import os
 import sys
