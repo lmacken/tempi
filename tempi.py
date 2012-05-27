@@ -122,7 +122,7 @@ class Tempi(object):
         waiting = True
         print('Updating Catalog...')
         progress = ProgressBar(maxval=100, widgets=[
-            Bar(marker=u"\u2593", left='[', right=']'), Percentage()]).start()
+            Bar(marker=u"\u2593"), Percentage()]).start()
         while waiting:
             time.sleep(1)
             status = self.catalog.status(ticket)
@@ -146,8 +146,7 @@ class Tempi(object):
 
     def update_tempo_metadata(self, items):
         progress = ProgressBar(maxval=len(items), widgets=[
-            Bar(marker=u"\u2593", left='[', right=']'),
-            Percentage()])
+            Bar(marker=u"\u2593"), Percentage()])
         up, save, restore, chop = ['\x1b[' + x for x in 'FsuK']
         print('\n')
         for item in progress(items):
