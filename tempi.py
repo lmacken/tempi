@@ -36,7 +36,7 @@ pyechonest.config.ECHO_NEST_API_KEY = ''
 pyechonest.config.ECHO_NEST_CONSUMER_KEY = ''
 pyechonest.config.ECHO_NEST_SHARED_SECRET = ''
 
-MAX_SONGS = 1000  # per catalog update
+MAX_SONGS = 100  # per catalog update
 
 
 class Tempi(object):
