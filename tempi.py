@@ -85,9 +85,9 @@ class Tempi(object):
                     'action': 'update',
                     'item': {
                         'url': song.filename,
-                        'item_id': id,
-                        'artist_name': artist,
-                        'song_name': title,
+                        'item_id': id.encode('utf-8'),
+                        'artist_name': artist.encode('utf-8'),
+                        'song_name': title.encode('utf-8'),
                         }})
         return data
 
@@ -109,7 +109,6 @@ class Tempi(object):
         while True:
             chunk = data[:MAX_SONGS]
             chunk_len = len(chunk)
-            assert chunk_len <= MAX_SONGS, chunk_len
             ticket = self.catalog.update(chunk)
             for status in self.wait_for_catalog_update(ticket):
                 progress.update(int(status['percent_complete']) * chunk_i)
