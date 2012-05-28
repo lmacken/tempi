@@ -139,7 +139,7 @@ class Tempi(object):
                 try:
                     song = mutagen.File(os.path.join(root, filename), easy=True)
                 except Exception, e:
-                    print(str(e))
+                    print('%s: %s' % (filename, str(e)))
                     self.errors += 1
                 if not song:
                     continue
