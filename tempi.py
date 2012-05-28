@@ -126,7 +126,7 @@ class Tempi(object):
     def wait_for_catalog_update(self, ticket):
         waiting = True
         while waiting:
-            time.sleep(1)
+            time.sleep(3)
             status = self.catalog.status(ticket)
             assert status['ticket_status'] != 'error', status
             yield status
