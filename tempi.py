@@ -19,9 +19,9 @@ tempi.py - Add tempo metadata to your music collection using The Echo Nest.
 
 __version__ = '0.2'
 
-import re
 import os
 import sys
+import sha
 import time
 import math
 import mutagen
@@ -56,10 +56,6 @@ class Tempi(object):
         if items:
             self.update_tempo_metadata(items)
 
-    def song_id(self, song):
-        """Return a valid Echo Nest item_id for a given song"""
-        return re.sub(r'[^A-Za-z0-9\._\-]', '', song)
-
     def generate_catalog_data(self):
         """Generate a list of songs to update our Echo Nest Catalog with"""
         data = []
@@ -78,7 +74,8 @@ class Tempi(object):
                 self.bpm_exists += 1
                 continue
             if artist and title:
-                id = self.song_id('%s - %s' % (artist, title))
+                id = sha.new(('%s-%s' % (artist, title))
+                        .encode('utf-8', errors='ignore')).hexdigest()
                 if song.filename in songs or id in ids:
                     self.song_dupe += 1
                     continue
