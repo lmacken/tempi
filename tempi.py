@@ -159,7 +159,10 @@ class Tempi(object):
                 sys.stdout.write("%s%sUpdating Metadata: %s (%0.2f BPM)%s%s" %
                         (save, up, name, tempo, chop, restore))
                 sys.stdout.flush()
-                song['bpm'] = unicode(tempo)
+                try:
+                    song['bpm'] = unicode(tempo)
+                except:  # hack for mp4 files
+                    song['bpm'] = [float(tempo)]
                 song.save()
                 self.bpm_found += 1
             else:
