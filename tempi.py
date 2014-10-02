@@ -12,7 +12,7 @@
 # You should have received a copy of the GNU General Public License
 # along with tempi.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Copyright (C) 2012, Luke Macken <lmacken@redhat.com>
+# Copyright (C) 2012-2014, Luke Macken <lmacken@redhat.com>
 """
 tempi.py - Add tempo metadata to your music collection using The Echo Nest.
 """
