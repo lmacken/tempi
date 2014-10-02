@@ -194,7 +194,7 @@ class LibraryProgress(Counter):
         return str(int(pbar.currval) + 1)
 
 
-if __name__ == '__main__':
+def main():
     if len(sys.argv) != 2:
         print("Usage: python %s <directory of music>" % sys.argv[0])
         sys.exit(-1)
