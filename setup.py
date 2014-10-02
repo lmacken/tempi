@@ -11,6 +11,7 @@ setup(
     description="Add tempo metadata to your music collection.",
     classifiers=[
         "Topic :: Multimedia :: Sound/Audio :: Analysis",
+        "License :: OSI Approved :: GNU Affero General Public License v3",
     ],
     keywords="music tempo bpm echonest",
     author="Luke Macken",
