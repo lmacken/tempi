@@ -201,7 +201,7 @@ if __name__ == '__main__':
     try:
         import fabulous.text
         print(str(fabulous.text.Text('tempi', shadow=True,
-            font='IndUni-H-Bold', color='#73d216')).rstrip() +
+            font='DejaVuSansMono', color='#73d216')).rstrip() +
             ' v%s' % __version__)
     except ImportError:
         print('tempi v%s' % __version__)
